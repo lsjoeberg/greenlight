@@ -18,7 +18,7 @@ func (app *application) showMovieHandler(w http.ResponseWriter, r *http.Request)
 	// Check if movie ID is valid.
 	id, err := app.readIDParam(r)
 	if err != nil {
-		http.NotFound(w, r)
+		app.notFoundResponse(w, r)
 		return
 	}
 
@@ -34,7 +34,6 @@ func (app *application) showMovieHandler(w http.ResponseWriter, r *http.Request)
 	// Encode the struct to JSON and send it as the HTTP response.
 	err = app.writeJSON(w, http.StatusOK, envelope{"movie": movie}, nil)
 	if err != nil {
-		app.logger.Println(err)
-		http.Error(w, "The server encountered a problem and could not process your request", http.StatusInternalServerError)
+		app.serverErrorResponse(w, r, err)
 	}
 }
