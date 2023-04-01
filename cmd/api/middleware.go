@@ -53,6 +53,11 @@ func (app *application) rateLimit(next http.Handler) http.Handler {
 
 	// Return a closure over the limiter.
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if !app.config.limiter.enabled {
+			next.ServeHTTP(w, r)
+			return
+		}
+
 		// Extract the client's IP address from the request.
 		ip, _, err := net.SplitHostPort(r.RemoteAddr)
 		if err != nil {
@@ -65,7 +70,12 @@ func (app *application) rateLimit(next http.Handler) http.Handler {
 
 		// Add client rate-limiter to map if not present.
 		if _, found := clients[ip]; !found {
-			clients[ip] = &client{limiter: rate.NewLimiter(2, 4)}
+			clients[ip] = &client{
+				limiter: rate.NewLimiter(
+					rate.Limit(app.config.limiter.rps),
+					app.config.limiter.burst,
+				),
+			}
 		}
 
 		// Update the last seen time for the client.
