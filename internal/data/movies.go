@@ -46,16 +46,18 @@ func ValidateMovie(v *validator.Validator, movie *Movie) {
 
 // Models wraps application storage models.
 type Models struct {
-	Movies MovieModel
-	Tokens TokenModel
-	Users  UserModel
+	Movies      MovieModel
+	Permissions PermissionModel
+	Tokens      TokenModel
+	Users       UserModel
 }
 
 func NewModels(db *sql.DB) Models {
 	return Models{
-		Movies: MovieModel{DB: db},
-		Tokens: TokenModel{DB: db},
-		Users:  UserModel{DB: db},
+		Movies:      MovieModel{DB: db},
+		Permissions: PermissionModel{DB: db},
+		Tokens:      TokenModel{DB: db},
+		Users:       UserModel{DB: db},
 	}
 }
 
