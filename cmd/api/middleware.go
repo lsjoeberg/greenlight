@@ -33,7 +33,6 @@ func (app *application) recoverPanic(next http.Handler) http.Handler {
 }
 
 func (app *application) rateLimit(next http.Handler) http.Handler {
-
 	// client holds a rate limiter and last seen time for a particular client.
 	type client struct {
 		limiter  *rate.Limiter
@@ -41,7 +40,7 @@ func (app *application) rateLimit(next http.Handler) http.Handler {
 	}
 
 	var mu sync.Mutex
-	var clients = make(map[string]*client)
+	clients := make(map[string]*client)
 
 	// Run a background goroutine to check for inactive clients every minute,
 	// and remove from the clients map.
@@ -203,7 +202,6 @@ func (app *application) requirePermission(code string, next http.HandlerFunc) ht
 
 		// Otherwise they have the required permission.
 		next.ServeHTTP(w, r)
-
 	}
 
 	// Wrap this with the requireActivatedUser() middleware before returning it.
