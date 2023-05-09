@@ -3,6 +3,11 @@ version: '3'
 dotenv:
   - '.env'
 
+vars:
+  CURRENT_TIME:
+    sh: date -Iseconds
+  LINKER_FLAGS: '-s -w -X main.buildTime={{.CURRENT_TIME}}'
+
 tasks:
   run:api:
     cmds:
@@ -11,8 +16,11 @@ tasks:
 
   build:api:
     cmds:
-      - go build -ldflags='-s -w' -o=./bin/api ./cmd/api
-      - GOOS=linux GOARCH=amd64 go build -ldflags='-s -w' -o=./bin/linux_amd64/api ./cmd/api
+      - go build -ldflags='{{.LINKER_FLAGS}}' -o=./bin/api ./cmd/api
+      - GOOS=linux GOARCH=amd64 go build -ldflags='{{.LINKER_FLAGS}}' -o=./bin/linux_amd64/api ./cmd/api
+    vars:
+      CURRENT_TIME:
+        sh: date -Iseconds
 
   db:migrations:new:
     cmds:
