@@ -1,0 +1,20 @@
+version: '3'
+
+dotenv:
+  - '.env'
+
+tasks:
+  run:api:
+    cmds:
+      - go run ./cmd/api -db-dsn=${GREENLIGHT_DB_DSN}
+    silent: true
+
+  db:migrations:new:
+    cmds:
+      - migrate create -seq -ext=.sql -dir=./migrations {{.CLI_ARGS}}
+    silent: true
+
+  db:migrations:up:
+    cmds:
+      - migrate -path ./migrations -database ${GREENLIGHT_DB_DSN} up
+    silent: true
