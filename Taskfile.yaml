@@ -1,0 +1,44 @@
+version: '3'
+
+dotenv:
+  - '.env'
+
+vars:
+  CURRENT_TIME:
+    sh: date -Iseconds
+  GIT_DESC:
+    sh: git describe --always --dirty --tags --long
+  LINKER_FLAGS: '-s -w -X main.buildTime={{.CURRENT_TIME}} -X main.version={{.GIT_DESC}}'
+
+tasks:
+  run:api:
+    cmds:
+      - go run ./cmd/api -db-dsn=${GREENLIGHT_DB_DSN}
+    silent: true
+
+  build:api:
+    cmds:
+      - go build -ldflags='{{.LINKER_FLAGS}}' -o=./bin/api ./cmd/api
+      - GOOS=linux GOARCH=amd64 go build -ldflags='{{.LINKER_FLAGS}}' -o=./bin/linux_amd64/api ./cmd/api
+    vars:
+      CURRENT_TIME:
+        sh: date -Iseconds
+
+  db:migrations:new:
+    cmds:
+      - migrate create -seq -ext=.sql -dir=./migrations {{.CLI_ARGS}}
+    silent: true
+
+  db:migrations:up:
+    cmds:
+      - migrate -path ./migrations -database ${GREENLIGHT_DB_DSN} up
+    silent: true
+
+  audit:
+    cmds:
+      - go mod tidy
+      - go mod verify
+      - go fmt ./...
+      - go vet ./...
+      - staticcheck ./...
+      - go test -race -vet=off ./...
