@@ -6,7 +6,9 @@ dotenv:
 vars:
   CURRENT_TIME:
     sh: date -Iseconds
-  LINKER_FLAGS: '-s -w -X main.buildTime={{.CURRENT_TIME}}'
+  GIT_REVISION:
+    sh: git describe --always --dirty
+  LINKER_FLAGS: '-s -w -X main.buildTime={{.CURRENT_TIME}} -X main.version={{.GIT_REVISION}}'
 
 tasks:
   run:api:

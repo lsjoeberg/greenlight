@@ -18,11 +18,13 @@ import (
 	"github.com/lsjoeberg/greenlight/internal/mailer"
 )
 
-const version = "1.0.0"
-
-// buildTime holds the executable binary build time, as supplied via the
-// linker flag, -X.
-var buildTime string
+var (
+	// The buildTime holds the executable binary build time, as supplied via the
+	// linker flag, -X.
+	buildTime string
+	// The version holds the git revision for the build.
+	version string
+)
 
 // config holds application configuration.
 type config struct {
